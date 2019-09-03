@@ -1230,7 +1230,7 @@ stream_call:
     sec
     lda <sound_local_word_1
     sbc #low(1)
-    sta <stream_read_address_lo,x
+    sta stream_read_address_lo,x
     lda <sound_local_word_1+1
     sbc #high(1)
     sta stream_read_address_hi,x
