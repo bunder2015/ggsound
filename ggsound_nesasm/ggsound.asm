@@ -7,83 +7,83 @@
 sound_initialize:
 
     lda #1
-    sta sound_disable_update
+    sta <sound_disable_update
 
-    lda sound_param_byte_0
-    sta sound_region
+    lda <sound_param_byte_0
+    sta <sound_region
 
     ;Get songs address.
-    lda sound_param_word_0
-    sta song_list_address
-    lda sound_param_word_0+1
-    sta song_list_address+1
+    lda <sound_param_word_0
+    sta <song_list_address
+    lda <sound_param_word_0+1
+    sta <song_list_address+1
 
     ;Get sfx address.
-    lda sound_param_word_1
-    sta sfx_list_address
-    lda sound_param_word_1+1
-    sta sfx_list_address+1
+    lda <sound_param_word_1
+    sta <sfx_list_address
+    lda <sound_param_word_1+1
+    sta <sfx_list_address+1
 
     ;Get instruments address.
-    lda sound_param_word_2
-    sta addr_instruments
-    lda sound_param_word_2+1
-    sta addr_instruments+1
+    lda <sound_param_word_2
+    sta <addr_instruments
+    lda <sound_param_word_2+1
+    sta <addr_instruments+1
 
       ifdef FEATURE_DPCM
     ;Get dpcm samples list.
     ldy #0
     lda [sound_param_word_3],y
-    sta addr_dpcm_sample_table
+    sta <addr_dpcm_sample_table
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_sample_table+1
+    sta <addr_dpcm_sample_table+1
     ;Get dpcm note to sample index table.
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_sample_index
+    sta <addr_dpcm_note_to_sample_index
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_sample_index+1
+    sta <addr_dpcm_note_to_sample_index+1
     ;Get dpcm note to sample length table.
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_sample_length
+    sta <addr_dpcm_note_to_sample_length
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_sample_length+1
+    sta <addr_dpcm_note_to_sample_length+1
     ;Get dpcm note to loop and pitch index table.
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_loop_pitch_index
+    sta <addr_dpcm_note_to_loop_pitch_index
     iny
     lda [sound_param_word_3],y
-    sta addr_dpcm_note_to_loop_pitch_index+1
+    sta <addr_dpcm_note_to_loop_pitch_index+1
       endif
 
     ;Load PAL note table for PAL, NTSC for any other region.
-    lda sound_region
+    lda <sound_region
     cmp #SOUND_REGION_PAL
     beq .pal
 .nstc:
     lda #low(ntsc_note_table_lo)
-    sta addr_note_table_lo
+    sta <addr_note_table_lo
     lda #high(ntsc_note_table_lo)
-    sta addr_note_table_lo+1
+    sta <addr_note_table_lo+1
     lda #low(ntsc_note_table_hi)
-    sta addr_note_table_hi
+    sta <addr_note_table_hi
     lda #high(ntsc_note_table_hi)
-    sta addr_note_table_hi+1
+    sta <addr_note_table_hi+1
     jmp .done
 .pal:
     lda #low(pal_note_table_lo)
-    sta addr_note_table_lo
+    sta <addr_note_table_lo
     lda #high(pal_note_table_lo)
-    sta addr_note_table_lo+1
+    sta <addr_note_table_lo+1
     lda #low(pal_note_table_hi)
-    sta addr_note_table_hi
+    sta <addr_note_table_hi
     lda #high(pal_note_table_hi)
-    sta addr_note_table_hi+1
+    sta <addr_note_table_hi+1
 .done:
 
     ;Enable square 1, square 2, triangle and noise.
@@ -92,10 +92,10 @@ sound_initialize:
 
     ;Ensure no apu data is uploaded yet.
     lda #0
-    sta apu_data_ready
+    sta <apu_data_ready
       ifdef FEATURE_DPCM
     lda #DPCM_STATE_NOP
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
       endif
 
     jsr sound_initialize_apu_buffer
@@ -103,7 +103,7 @@ sound_initialize:
     ;Make sure all streams are killed.
     jsr sound_stop
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     rts
 
@@ -115,7 +115,7 @@ sound_stop:
     txa
     pha
 
-    inc sound_disable_update
+    inc <sound_disable_update
 
     ;Kill all streams.
     ldx #(MAX_STREAMS-1)
@@ -129,7 +129,7 @@ sound_stop:
 
     jsr sound_initialize_apu_buffer
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     ;Restore x.
     pla
@@ -154,7 +154,7 @@ sound_update:
 
     ;Signal apu data not ready.
     lda #0
-    sta apu_data_ready
+    sta <apu_data_ready
 
     ;First copy all music streams.
     ldx #0
@@ -224,7 +224,7 @@ sound_update:
 
     ;Signial apu data ready.
     lda #1
-    sta apu_data_ready
+    sta <apu_data_ready
 
     ;Restore regs.
     pla
@@ -371,10 +371,10 @@ square_1_play_note:
     ldy stream_instrument_index,x
     ;Load instrument address.
     lda [addr_instruments],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [addr_instruments],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
     ;Set negate flag for sweep unit.
     lda #$08
@@ -559,10 +559,10 @@ triangle_play_note:
     ldy stream_instrument_index,x
     ;Load instrument address.
     lda [addr_instruments],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [addr_instruments],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
       ifdef FEATURE_ARPEGGIOS
     ;Get arpeggio type.
@@ -690,10 +690,10 @@ noise_play_note:
     ldy stream_instrument_index,x
     ;Load instrument address.
     lda [addr_instruments],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [addr_instruments],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
       ifdef FEATURE_ARPEGGIOS
     ;Get arpeggio type.
@@ -721,7 +721,7 @@ noise_play_note:
 
     tya
     and #%01111111
-    sta sound_local_byte_0
+    sta <sound_local_byte_0
 
     ;Skip loading note pitch if already loaded, to allow envelopes
     ;to modify the pitch.
@@ -733,7 +733,7 @@ noise_play_note:
     sta stream_flags,x
     lda stream_channel_register_3,x
     and #%10000000
-    ora sound_local_byte_0
+    ora <sound_local_byte_0
     sta stream_channel_register_3,x
 .pitch_already_loaded:
 
@@ -784,7 +784,7 @@ noise_play_note:
     ;Save off current duty bit.
     lda stream_channel_register_3,x
     and #%10000000
-    sta sound_local_byte_0
+    sta <sound_local_byte_0
 
     ;Advance pitch regardless of duty bit.
     clc
@@ -792,7 +792,7 @@ noise_play_note:
     adc [sound_local_word_0],y
     and #%00001111
     ;Get duty bit back in.
-    ora sound_local_byte_0
+    ora <sound_local_byte_0
     sta stream_channel_register_3,x
 
     ;Move pitch offset along.
@@ -822,11 +822,11 @@ noise_play_note:
     ;We only care about bit 6 for noise, and we want it in bit 7 position.
     lda [sound_local_word_0],y
     asl a
-    sta sound_local_byte_0
+    sta <sound_local_byte_0
 
     lda stream_channel_register_3,x
     and #%01111111
-    ora sound_local_byte_0
+    ora <sound_local_byte_0
     sta stream_channel_register_3,x
 
     ;Move duty offset along.
@@ -867,13 +867,13 @@ dpcm_play_note:
     sta stream_channel_register_4,x
 
     ;Upload the dpcm data if sfx commands are not overriding.
-    lda apu_dpcm_state
+    lda <apu_dpcm_state
     cmp #DPCM_STATE_WAIT
     beq .skip
     cmp #DPCM_STATE_UPLOAD_THEN_WAIT
     beq .skip
     lda #DPCM_STATE_UPLOAD
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
 .skip:
 
     lda stream_flags,x
@@ -1082,9 +1082,9 @@ stream_set_instrument:
     advance_stream_read_address
     ;Load byte at read address.
     lda stream_read_address_lo,x
-    sta sound_local_word_0
+    sta <sound_local_word_0
     lda stream_read_address_hi,x
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
     ldy #0
     lda [sound_local_word_0],y
     asl a
@@ -1092,10 +1092,10 @@ stream_set_instrument:
     tay
 
     lda [addr_instruments],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [addr_instruments],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
     ldy #0
     lda [sound_local_word_0],y
@@ -1139,9 +1139,9 @@ stream_set_length_lo:
     advance_stream_read_address
     ;Load byte at read address.
     lda stream_read_address_lo,x
-    sta sound_local_word_0
+    sta <sound_local_word_0
     lda stream_read_address_hi,x
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
     ldy #0
     lda [sound_local_word_0],y
     sta stream_note_length_lo,x
@@ -1157,9 +1157,9 @@ stream_set_length_hi:
     advance_stream_read_address
     ;Load byte at read address.
     lda stream_read_address_lo,x
-    sta sound_local_word_0
+    sta <sound_local_word_0
     lda stream_read_address_hi,x
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
     ldy #0
     lda [sound_local_word_0],y
     sta stream_note_length_hi,x
@@ -1174,9 +1174,9 @@ stream_goto:
     advance_stream_read_address
     ;Load byte at read address.
     lda stream_read_address_lo,x
-    sta sound_local_word_0
+    sta <sound_local_word_0
     lda stream_read_address_hi,x
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
     ldy #0
     lda [sound_local_word_0],y
     sta stream_read_address_lo,x
@@ -1205,18 +1205,18 @@ stream_call:
 
     advance_stream_read_address
     lda stream_read_address_lo,x
-    sta sound_local_word_0
+    sta <sound_local_word_0
     lda stream_read_address_hi,x
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
     ;Retrieve lo byte of destination address from first CAL parameter.
     ldy #0
     lda [sound_local_word_0],y
-    sta sound_local_word_1
+    sta <sound_local_word_1
     iny
     ;Retrieve hi byte of destination address from second CAL parameter.
     lda [sound_local_word_0],y
-    sta sound_local_word_1+1
+    sta <sound_local_word_1+1
 
     advance_stream_read_address
 
@@ -1228,10 +1228,10 @@ stream_call:
 
     ;Finally, transfer address we are calling to current read address.
     sec
-    lda sound_local_word_1
+    lda <sound_local_word_1
     sbc #low(1)
-    sta stream_read_address_lo,x
-    lda sound_local_word_1+1
+    sta <stream_read_address_lo,x
+    lda <sound_local_word_1+1
     sbc #high(1)
     sta stream_read_address_hi,x
 
@@ -1289,22 +1289,22 @@ play_song:
     txa
     pha
 
-    inc sound_disable_update
+    inc <sound_disable_update
 
     ;Select header tempo offset based on region.
-    ldx sound_region
+    ldx <sound_region
     lda sound_region_to_tempo_offset,x
-    sta sound_local_byte_0
+    sta <sound_local_byte_0
 
     ;Get song address from song list.
-    lda sound_param_byte_0
+    lda <sound_param_byte_0
     asl a
     tay
     lda [song_list_address],y
-    sta song_address
+    sta <song_address
     iny
     lda [song_list_address],y
-    sta song_address+1
+    sta <song_address+1
 
     ;Load square 1 stream.
     ldx #0
@@ -1312,23 +1312,23 @@ play_song:
 
     ldy #track_header_square1_stream_address
     lda [song_address],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [song_address],y
     beq .no_square_1
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #0
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
     lda #0
-    sta sound_param_byte_1
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_0
+    adc <sound_local_byte_0
     tay
     lda [song_address],y
     sta stream_tempo_lo,x
@@ -1346,23 +1346,23 @@ play_song:
 
     ldy #track_header_square2_stream_address
     lda [song_address],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [song_address],y
     beq .no_square_2
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #1
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
     lda #1
-    sta sound_param_byte_1
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_0
+    adc <sound_local_byte_0
     tay
     lda [song_address],y
     sta stream_tempo_lo,x
@@ -1380,23 +1380,23 @@ play_song:
 
     ldy #track_header_triangle_stream_address
     lda [song_address],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [song_address],y
     beq .no_triangle
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #2
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
     lda #2
-    sta sound_param_byte_1
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_0
+    adc <sound_local_byte_0
     tay
     lda [song_address],y
     sta stream_tempo_lo,x
@@ -1414,23 +1414,23 @@ play_song:
 
     ldy #track_header_noise_stream_address
     lda [song_address],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [song_address],y
     beq .no_noise
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #3
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
     lda #3
-    sta sound_param_byte_1
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_0
+    adc <sound_local_byte_0
     tay
     lda [song_address],y
     sta stream_tempo_lo,x
@@ -1449,22 +1449,22 @@ play_song:
 
     ldy #track_header_dpcm_stream_address
     lda [song_address],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [song_address],y
     beq .no_dpcm
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #4
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
     lda #4
-    sta sound_param_byte_1
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
     lda #DPCM_STATE_NOP
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
 
     ;Reset load counter to safeguard against accumulating too far
     ;in one direction. (can cause distortion). Suggestion by thefox
@@ -1474,7 +1474,7 @@ play_song:
 
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_0
+    adc <sound_local_byte_0
     tay
     lda [song_address],y
     sta stream_tempo_lo,x
@@ -1487,7 +1487,7 @@ play_song:
 .no_dpcm:
       endif
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     ;Restore index regs.
     pla
@@ -1510,47 +1510,47 @@ play_sfx:
     txa
     pha
 
-    inc sound_disable_update
+    inc <sound_disable_update
 
     ;Select header tempo offset based on region.
-    ldx sound_region
+    ldx <sound_region
     lda sound_region_to_tempo_offset,x
-    sta sound_local_byte_1
+    sta <sound_local_byte_1
 
     ;Get sfx address from sfx list.
-    lda sound_param_byte_0
+    lda <sound_param_byte_0
     asl a
     tay
     lda [sfx_list_address],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [sfx_list_address],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
 
-    lda sound_param_byte_1
-    sta sound_local_byte_0
+    lda <sound_param_byte_1
+    sta <sound_local_byte_0
 
     ;Load square 1 stream.
     ldy #track_header_square1_stream_address
     lda [sound_local_word_0],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [sound_local_word_0],y
     beq .no_square_1
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #0
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
-    lda sound_local_byte_0
-    sta sound_param_byte_1
+    lda <sound_local_byte_0
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
-    ldx sound_local_byte_0
+    ldx <sound_local_byte_0
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_1
+    adc <sound_local_byte_1
     tay
     lda [sound_local_word_0],y
     sta stream_tempo_lo,x
@@ -1560,10 +1560,10 @@ play_sfx:
     sta stream_tempo_hi,x
     sta stream_tempo_counter_hi,x
 
-    inc sound_local_byte_0
+    inc <sound_local_byte_0
 .no_square_1:
 
-    lda sound_local_byte_0
+    lda <sound_local_byte_0
     cmp #(soundeffect_two + 1)
     bne .skip0
     jmp .no_more_sfx_streams_available
@@ -1572,24 +1572,24 @@ play_sfx:
     ;Load square 2 stream.
     ldy #track_header_square2_stream_address
     lda [sound_local_word_0],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [sound_local_word_0],y
     beq .no_square_2
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #1
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
-    lda sound_local_byte_0
-    sta sound_param_byte_1
+    lda <sound_local_byte_0
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
-    ldx sound_local_byte_0
+    ldx <sound_local_byte_0
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_1
+    adc <sound_local_byte_1
     tay
     lda [sound_local_word_0],y
     sta stream_tempo_lo,x
@@ -1599,10 +1599,10 @@ play_sfx:
     sta stream_tempo_hi,x
     sta stream_tempo_counter_hi,x
 
-    inc sound_local_byte_0
+    inc <sound_local_byte_0
 .no_square_2:
 
-    lda sound_local_byte_0
+    lda <sound_local_byte_0
     cmp #(soundeffect_two + 1)
     bne .skip1
     jmp .no_more_sfx_streams_available
@@ -1611,24 +1611,24 @@ play_sfx:
     ;Load triangle stream.
     ldy #track_header_triangle_stream_address
     lda [sound_local_word_0],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [sound_local_word_0],y
     beq .no_triangle
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #2
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
-    lda sound_local_byte_0
-    sta sound_param_byte_1
+    lda <sound_local_byte_0
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
-    ldx sound_local_byte_0
+    ldx <sound_local_byte_0
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_1
+    adc <sound_local_byte_1
     tay
     lda [sound_local_word_0],y
     sta stream_tempo_lo,x
@@ -1638,34 +1638,34 @@ play_sfx:
     sta stream_tempo_hi,x
     sta stream_tempo_counter_hi,x
 
-    inc sound_local_byte_0
+    inc <sound_local_byte_0
 .no_triangle:
 
-    lda sound_local_byte_0
+    lda <sound_local_byte_0
     cmp #(soundeffect_two + 1)
     beq .no_more_sfx_streams_available
 
     ;Load noise stream.
     ldy #track_header_noise_stream_address
     lda [sound_local_word_0],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [sound_local_word_0],y
     beq .no_noise
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #3
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
-    lda sound_local_byte_0
-    sta sound_param_byte_1
+    lda <sound_local_byte_0
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
-    ldx sound_local_byte_0
+    ldx <sound_local_byte_0
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_1
+    adc <sound_local_byte_1
     tay
     lda [sound_local_word_0],y
     sta stream_tempo_lo,x
@@ -1675,31 +1675,31 @@ play_sfx:
     sta stream_tempo_hi,x
     sta stream_tempo_counter_hi,x
 
-    inc sound_local_byte_0
+    inc <sound_local_byte_0
 .no_noise:
 
       ifdef FEATURE_DPCM
     ;Load dpcm stream.
     ldy #track_header_dpcm_stream_address
     lda [sound_local_word_0],y
-    sta sound_param_word_0
+    sta <sound_param_word_0
     iny
     lda [sound_local_word_0],y
     beq .no_dpcm
-    sta sound_param_word_0+1
+    sta <sound_param_word_0+1
 
     lda #4
-    sta sound_param_byte_0
+    sta <sound_param_byte_0
 
-    lda sound_local_byte_0
-    sta sound_param_byte_1
+    lda <sound_local_byte_0
+    sta <sound_param_byte_1
 
     jsr stream_initialize
 
-    ldx sound_local_byte_0
+    ldx <sound_local_byte_0
     clc
     lda #track_header_ntsc_tempo_lo
-    adc sound_local_byte_1
+    adc <sound_local_byte_1
     tay
     lda [sound_local_word_0],y
     sta stream_tempo_lo,x
@@ -1711,13 +1711,13 @@ play_sfx:
     sta stream_tempo_counter_hi,x
 
     lda #DPCM_STATE_UPLOAD_THEN_WAIT
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
 .no_dpcm:
      endif
 
 .no_more_sfx_streams_available:
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     ;Restore index regs.
     pla
@@ -1780,7 +1780,7 @@ starting_read_address = sound_param_word_0
 
     ldx stream
 
-    inc sound_disable_update
+    inc <sound_disable_update
 
     lda starting_read_address
     ora starting_read_address+1
@@ -1833,7 +1833,7 @@ starting_read_address = sound_param_word_0
     sta stream_flags,x
 .null_starting_read_address:
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     ;Restore x.
     pla
@@ -1845,12 +1845,12 @@ starting_read_address = sound_param_word_0
 ;Assumes x contains the index of the stream to kill.
 stream_stop:
 
-    inc sound_disable_update
+    inc <sound_disable_update
 
     lda #0
     sta stream_flags,x
 
-    dec sound_disable_update
+    dec <sound_disable_update
 
     rts
 
@@ -1966,10 +1966,10 @@ read_address = sound_local_word_1
 
     ldy stream_instrument_index,x
     lda [addr_instruments],y
-    sta sound_local_word_0
+    sta <sound_local_word_0
     iny
     lda [addr_instruments],y
-    sta sound_local_word_0+1
+    sta <sound_local_word_0+1
     ldy #0
     lda [sound_local_word_0],y
     sta stream_volume_offset,x
@@ -2011,21 +2011,21 @@ sound_initialize_apu_buffer:
 
     ;Set Saw Envelope Disable and Length Counter Disable to 1 for square 1.
     lda #%00110000
-    sta apu_register_sets
+    sta <apu_register_sets
 
     ;Set Negate flag on the sweep unit.
     lda #$08
-    sta apu_register_sets+1
+    sta <apu_register_sets+1
 
     ;Set period to C9, which is a C#...just in case nobody writes to it.
     lda #$C9
-    sta apu_register_sets+2
+    sta <apu_register_sets+2
 
     ;Make sure the old value starts out different from the first default value.
-    sta apu_square_1_old
+    sta <apu_square_1_old
 
     lda #$00
-    sta apu_register_sets+3
+    sta <apu_register_sets+3
 
     ;****************************************************************
     ;Initialize Square 2
@@ -2033,71 +2033,71 @@ sound_initialize_apu_buffer:
 
     ;Set Saw Envelope Disable and Length Counter Disable to 1 for square 2.
     lda #%00110000
-    sta apu_register_sets+4
+    sta <apu_register_sets+4
 
     ;Set Negate flag on the sweep unit.
     lda #$08
-    sta apu_register_sets+5
+    sta <apu_register_sets+5
 
     ;Set period to C9, which is a C#...just in case nobody writes to it.
     lda #$C9
-    sta apu_register_sets+6
+    sta <apu_register_sets+6
 
     ;Make sure the old value starts out different from the first default value.
-    sta apu_square_2_old
+    sta <apu_square_2_old
 
     lda #$00
-    sta apu_register_sets+7
+    sta <apu_register_sets+7
 
     ;****************************************************************
     ;Initialize Triangle
     ;****************************************************************
     lda #%10000000
-    sta apu_register_sets+8
+    sta <apu_register_sets+8
 
     lda #$C9
-    sta apu_register_sets+10
+    sta <apu_register_sets+10
 
     lda #$00
-    sta apu_register_sets+11
+    sta <apu_register_sets+11
 
     ;****************************************************************
     ;Initialize Noise
     ;****************************************************************
     lda #%00110000
-    sta apu_register_sets+12
+    sta <apu_register_sets+12
 
     lda #%00000000
-    sta apu_register_sets+13
+    sta <apu_register_sets+13
 
     lda #%00000000
-    sta apu_register_sets+14
+    sta <apu_register_sets+14
 
     lda #%00000000
-    sta apu_register_sets+15
+    sta <apu_register_sets+15
 
       ifdef FEATURE_DPCM
     ;****************************************************************
     ;Initialize DPCM
     ;****************************************************************
     lda #0
-    sta apu_register_sets+16
+    sta <apu_register_sets+16
 
     lda #0
-    sta apu_register_sets+17
+    sta <apu_register_sets+17
 
     lda #0
-    sta apu_register_sets+18
+    sta <apu_register_sets+18
 
     lda #0
-    sta apu_register_sets+19
+    sta <apu_register_sets+19
       endif
 
     rts
 
 sound_upload:
 
-    lda apu_data_ready
+    lda <apu_data_ready
     beq .apu_data_not_ready
 
     jsr sound_upload_apu_register_sets
@@ -2108,64 +2108,64 @@ sound_upload:
 
 sound_upload_apu_register_sets:
 .square1:
-    lda apu_register_sets+0
+    lda <apu_register_sets+0
     sta $4000
-    lda apu_register_sets+1
+    lda <apu_register_sets+1
     sta $4001
-    lda apu_register_sets+2
+    lda <apu_register_sets+2
     sta $4002
-    lda apu_register_sets+3
+    lda <apu_register_sets+3
     ;Compare to last write.
-    cmp apu_square_1_old
+    cmp <apu_square_1_old
     ;Don't write this frame if they were equal.
     beq .square2
     sta $4003
     ;Save the value we just wrote to $4003.
-    sta apu_square_1_old
+    sta <apu_square_1_old
 .square2:
-    lda apu_register_sets+4
+    lda <apu_register_sets+4
     sta $4004
-    lda apu_register_sets+5
+    lda <apu_register_sets+5
     sta $4005
-    lda apu_register_sets+6
+    lda <apu_register_sets+6
     sta $4006
-    lda apu_register_sets+7
-    cmp apu_square_2_old
+    lda <apu_register_sets+7
+    cmp <apu_square_2_old
     beq .triangle
     sta $4007
     ;Save the value we just wrote to $4007.
-    sta apu_square_2_old
+    sta <apu_square_2_old
 .triangle:
-    lda apu_register_sets+8
+    lda <apu_register_sets+8
     sta $4008
-    lda apu_register_sets+10
+    lda <apu_register_sets+10
     sta $400A
-    lda apu_register_sets+11
+    lda <apu_register_sets+11
     sta $400B
 .noise:
-    lda apu_register_sets+12
+    lda <apu_register_sets+12
     sta $400C
-    lda apu_register_sets+14
+    lda <apu_register_sets+14
     ;Our notes go from 0 to 15 (low to high)
     ;but noise channel's low to high is 15 to 0.
-    eor #$0f
+    eor #$0F
     sta $400E
-    lda apu_register_sets+15
+    lda <apu_register_sets+15
     sta $400F
 
     ;Clear out all volume values from this frame in case a sound effect is killed suddenly.
     lda #%00110000
-    sta apu_register_sets
-    sta apu_register_sets+4
-    sta apu_register_sets+12
+    sta <apu_register_sets
+    sta <apu_register_sets+4
+    sta <apu_register_sets+12
     lda #%10000000
-    sta apu_register_sets+8
+    sta <apu_register_sets+8
 
       ifdef FEATURE_DPCM
     ;Now execute DPCM command/state machine. This state machine has logic for allowing
     ;a DPCM sound effect to override the currenty playing music DPCM sample until finished.
 .dpcm:
-    ldx apu_dpcm_state
+    ldx <apu_dpcm_state
     lda .dpcm_state_callback_hi,x
     pha
     lda .dpcm_state_callback_lo,x
@@ -2174,19 +2174,19 @@ sound_upload_apu_register_sets:
 .dpcm_upload:
     jsr .dpcm_upload_registers
     lda #DPCM_STATE_NOP
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
     rts
 .dpcm_upload_then_wait:
     jsr .dpcm_upload_registers
     lda #DPCM_STATE_WAIT
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
     rts
 .dpcm_wait:
     lda $4015
     and #%00010000
     bne .skip
     lda #DPCM_STATE_NOP
-    sta apu_dpcm_state
+    sta <apu_dpcm_state
 .skip:
     rts
 .dpcm_nop:
@@ -2205,11 +2205,11 @@ sound_upload_apu_register_sets:
     .db high((.dpcm_wait-1))
 
 .dpcm_upload_registers:
-    lda apu_register_sets+16
+    lda <apu_register_sets+16
     sta $4010
-    lda apu_register_sets+18
+    lda <apu_register_sets+18
     sta $4012
-    lda apu_register_sets+19
+    lda <apu_register_sets+19
     sta $4013
     ;Restart DPCM channel in case a new note was played before sample finished.
     lda #%00001111
