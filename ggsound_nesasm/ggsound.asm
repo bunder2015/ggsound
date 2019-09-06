@@ -176,13 +176,13 @@ sound_update:
     tay
     ;Copy the registers over.
     lda stream_channel_register_1,x
-    sta [apu_register_sets],y
+    sta apu_register_sets,y
     lda stream_channel_register_2,x
-    sta [apu_register_sets+1],y
+    sta apu_register_sets+1,y
     lda stream_channel_register_3,x
-    sta [apu_register_sets+2],y
+    sta apu_register_sets+2,y
     lda stream_channel_register_4,x
-    sta [apu_register_sets+3],y
+    sta apu_register_sets+3,y
 .song_stream_not_active:
 
     inx
@@ -209,13 +209,13 @@ sound_update:
     tay
     ;Copy the registers over.
     lda stream_channel_register_1,x
-    sta [apu_register_sets],y
+    sta apu_register_sets,y
     lda stream_channel_register_2,x
-    sta [apu_register_sets+1],y
+    sta apu_register_sets+1,y
     lda stream_channel_register_3,x
-    sta [apu_register_sets+2],y
+    sta apu_register_sets+2,y
     lda stream_channel_register_4,x
-    sta [apu_register_sets+3],y
+    sta apu_register_sets+3,y
 .sfx_stream_not_active:
 
     inx
